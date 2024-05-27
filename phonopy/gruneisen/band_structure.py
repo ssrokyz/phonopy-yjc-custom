@@ -75,10 +75,8 @@ class GruneisenBandStructure(GruneisenBase):
             qpoints = np.array(qpoints_)
             distances = np.zeros(len(qpoints))
             delta_qpoints = qpoints[1:] - qpoints[:-1]
-            delta_distances = np.sqrt(
-                (np.dot(delta_qpoints, rec_lattice) ** 2).sum(axis=1)
-            )
-            for i, dd in enumerate(delta_distances):
+            for i, dq in enumerate(delta_qpoints):
+                dd = np.linalg.norm(np.dot(rec_lattice, dq))
                 distances[i + 1] = distances[i] + dd
 
             self.set_qpoints(qpoints)
@@ -113,6 +111,11 @@ class GruneisenBandStructure(GruneisenBase):
             and len(labels) == (2 - np.array(self._path_connections)).sum()
         ):
             self._labels = labels
+
+        self._special_points = []
+        for i in range(len(self.get_distances())):
+            self._special_points.append(self.get_distances()[i][0])
+        self._special_points.append(self.get_distances()[-1][-1])
 
     def get_qpoints(self):
         """Return q-points."""
@@ -240,12 +243,12 @@ class GruneisenBandStructure(GruneisenBase):
         else:
             w.write(text)
 
-    def plot(self, axarr, epsilon=None, color_scheme=None):
+    def plot(self, axarr, epsilon=None, color_scheme=None, labels=None):
         """Return pyplot of band structure calculation results."""
         for band_structure in self._paths:
-            self._plot(axarr, band_structure, epsilon, color_scheme)
+            self._plot(axarr, band_structure, epsilon, color_scheme, labels)
 
-    def _plot(self, axarr, band_structure, epsilon, color_scheme):
+    def _plot(self, axarr, band_structure, epsilon, color_scheme, labels):
         (
             qpoints,
             distances,
@@ -286,10 +289,20 @@ class GruneisenBandStructure(GruneisenBase):
 
             self._plot_a_band(ax1, curve, distances_with_shift, i, n, color_scheme)
         ax1.set_xlim(0, distances_with_shift[-1])
+        ax1.set_xticks(self._special_points)
+        ax1.set_xticklabels(labels)
+        ax1.grid(alpha=0.5)
+        ax1.tick_params(axis="both",direction="in", labelsize='x-large')
+        ax1.set_ylabel('Gruneisen', fontsize='x-large')
 
         for i, freqs in enumerate(frequencies.T):
             self._plot_a_band(ax2, freqs, distances_with_shift, i, n, color_scheme)
+        ax2.set_xticks(self._special_points)
+        ax2.set_xticklabels(labels)
         ax2.set_xlim(0, distances_with_shift[-1])
+        ax2.grid(alpha=0.5)
+        ax2.tick_params(axis="both",direction="in", labelsize='x-large')
+        ax2.set_ylabel('Frequency (THz)', fontsize='x-large')
 
     def _plot_a_band(self, ax, curve, distances_with_shift, i, n, color_scheme):
         color = None

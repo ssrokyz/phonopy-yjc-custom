@@ -183,6 +183,7 @@ class Phonopy:
             )
         else:
             self._primitive_matrix = None
+        np.save('prim_mat.npy', self._primitive_matrix)
         self._supercell = None
         self._primitive = None
         self._build_supercell()
@@ -2515,13 +2516,16 @@ class Phonopy:
     def plot_projected_dos(
         self,
         pdos_indices=None,
+        pdos_colors=None,
         legend=None,
         legend_prop=None,
         legend_frameon=True,
         xlabel=None,
         ylabel=None,
         with_tight_frequency_range=False,
-    ):
+        total_dos_bool=True,
+        flip_xy=True,
+        ):
         """Plot projected DOS.
 
         Parameters
@@ -2551,30 +2555,30 @@ class Phonopy:
         import matplotlib.pyplot as plt
 
         fig, ax = plt.subplots()
-        ax.xaxis.set_ticks_position("both")
-        ax.yaxis.set_ticks_position("both")
-        ax.xaxis.set_tick_params(which="both", direction="in")
-        ax.yaxis.set_tick_params(which="both", direction="in")
+        ax.tick_params(axis="both",direction="in", labelsize='x-large')
 
         self._pdos.plot(
             ax,
             indices=pdos_indices,
+            pdos_colors=pdos_colors,
             legend=legend,
             legend_prop=legend_prop,
             legend_frameon=legend_frameon,
             xlabel=xlabel,
             ylabel=ylabel,
+            total_dos_bool=total_dos_bool,
+            flip_xy=flip_xy,
             draw_grid=False,
-        )
+            )
 
         if with_tight_frequency_range:
             fmin, fmax = get_dos_frequency_range(
                 self._pdos.frequency_points, self._pdos.projected_dos.sum(axis=0)
             )
             ax.set_xlim(fmin, fmax)
-        ax.set_ylim((0, None))
+        ax.set_ylim((None, None))
 
-        return plt
+        return plt, ax
 
     def write_partial_DOS(self, filename="partial_dos.dat"):
         """Write projected DOS to text file."""

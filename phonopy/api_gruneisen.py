@@ -163,7 +163,7 @@ class PhonopyGruneisen:
         """Write band structure calculation results to file in yaml."""
         self._band_structure.write_yaml()
 
-    def plot_band_structure(self, epsilon=1e-4, color_scheme=None):
+    def plot_band_structure(self, epsilon=1e-4, color_scheme=None, labels=None):
         """Return pyplot of band structure calculation results."""
         import matplotlib.pyplot as plt
 
@@ -173,5 +173,5 @@ class PhonopyGruneisen:
             ax.yaxis.set_ticks_position("both")
             ax.xaxis.set_tick_params(which="both", direction="in")
             ax.yaxis.set_tick_params(which="both", direction="in")
-            self._band_structure.plot(axarr, epsilon=epsilon, color_scheme=color_scheme)
+            self._band_structure.plot(axarr, epsilon=epsilon, color_scheme=color_scheme, labels=labels)
         return plt
