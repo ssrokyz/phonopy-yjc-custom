@@ -229,7 +229,7 @@ class TotalDos(Dos):
         self._freq_Debye = (3 * 3 * num_atoms / a2) ** (1.0 / 3)
         self._Debye_fit_coef = a2
 
-    def plot(self, ax, xlabel=None, ylabel=None, draw_grid=True, flip_xy=False):
+    def plot(self, ax, lc='k', xlabel=None, ylabel=None, draw_grid=True, flip_xy=False):
         """Plot total DOS."""
         if flip_xy:
             _xlabel = "Density of states"
@@ -249,6 +249,7 @@ class TotalDos(Dos):
             self._dos,
             freq_Debye=self._freq_Debye,
             Debye_fit_coef=self._Debye_fit_coef,
+            lc=lc,
             xlabel=_xlabel,
             ylabel=_ylabel,
             draw_grid=draw_grid,
@@ -552,6 +553,7 @@ def plot_total_dos(
     total_dos,
     freq_Debye=None,
     Debye_fit_coef=None,
+    lc='k',
     xlabel=None,
     ylabel=None,
     draw_grid=True,
@@ -569,7 +571,7 @@ def plot_total_dos(
         freqs = np.linspace(0, freq_Debye, num_points + 1)
 
     if flip_xy:
-        ax.plot(total_dos, frequency_points, "r-", linewidth=1)
+        ax.plot(total_dos, frequency_points, f"{lc}-", linewidth=1)
         if freq_Debye:
             ax.plot(
                 np.append(Debye_fit_coef * freqs**2, 0),
@@ -578,7 +580,7 @@ def plot_total_dos(
                 linewidth=1,
             )
     else:
-        ax.plot(frequency_points, total_dos, "r-", linewidth=1)
+        ax.plot(frequency_points, total_dos, f"{lc}-", linewidth=1)
         if freq_Debye:
             ax.plot(
                 np.append(freqs, freq_Debye),
